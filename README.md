@@ -67,7 +67,7 @@ After analyzing a dataset you may use the `figure.py` script to generate some fi
 python figure.py --running_average --running_average_file dataset/normal/prediction/running_average_individual.json --running_average_num 35 --running_average_offset 0 --running_average_title "Running average of Normal Samples" --running_average_use_overall_average
 ```
 That command will produce something similar to. This graph is particularly useful for noise analysis and understanding, roughly, how many images need to be sampled per biopsy for the FPW averages to converge.
-![Running average of normal biopsies (images/running_average.png)](images/running_average.png)
+![Running average of normal biopsies (images/running_average_normal.png)](images/running_average_normal.png)
 Please use `python figure.py --help` for more options.
 
 
