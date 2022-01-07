@@ -62,12 +62,17 @@ if args.running_average:
     hfont = {'fontname': 'Arial'}
     rc('font', family='serif', serif=['Arial'], weight='bold')
     rc('text', usetex=False)
+    rc('axes', titlesize=23)
+    rc('axes', labelsize=18)
+    rc('xtick', labelsize=13)
+    rc('ytick', labelsize=13)
+    rc('legend', fontsize=9)
 
     with open(args.running_average_file, 'r') as fp:
         data = json.load(fp)
 
     data = data['data']
-    fig = plt.figure(figsize=(14, 8))
+    fig = plt.figure(figsize=(11, 6))
     ax = fig.add_subplot(111)
     colors = sns.color_palette('bright', len(data) + 2)  # [(0, 0, 0)] * (len(data) + 2)
 
