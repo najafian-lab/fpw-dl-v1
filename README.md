@@ -18,7 +18,7 @@ A general rule is, the easier it is for you to identify the components of the im
 
 # Installation
 ## System Recommendations
-For best/quick results we recommend a GPU that's equivalent to or better than a GTX 1080 Ti, and a modern PC. Just as a reference we used an AMD Ryzen 3900X with a Titan RTX, to generate the results, with 64Gb of system ram and 24Gb of VRAM. Although other configurations will work, we cannot ensure inference time will be fast or if the model will even load with systems that have low GPU RAM or system RAM. We wouldn't even consider running tensorflow on a CPU with this model.  
+For best/quick results we recommend a GPU that's equivalent to or better than a GTX 1080 Ti, and a modern PC. Just as a reference we used an AMD Ryzen 3900X with a Titan RTX, to generate the results, with 64Gb of system ram and 24Gb of VRAM. Although other configurations will work, we cannot ensure inference time will be fast or if the model will even load with systems that have low GPU RAM or system RAM. Although you could run this model on CPU, we wouldn't recommend it.
 
 ### Anaconda and Command Line
 The installation does require a recent installation of anaconda. Please visit [anacondas page](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html) for more info. Furthermore, installation and usage of this repo requires knowledge of command line. This project was developed on/ran in linux, but should be able to run on any system.

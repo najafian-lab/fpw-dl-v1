@@ -20,3 +20,4 @@ dependencies:
     - tqdm
     - seaborn
     - requests
+    - tinycss2>=1.0.0
