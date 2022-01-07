@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import json
 import os
+import numpy as np
 from os import listdir
 
 import cv2
