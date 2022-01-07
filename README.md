@@ -30,10 +30,11 @@ cd fpw-dl-v1
 ```
 
 ### Create the anaconda environment and download dependencies
-This will create a new anaconda environment called `fpw-dl` and download all of the dependencies. NOTE: this package requires usage of Keras 2.2.X and Tensorflow 1.15 (CUDA 10.0, CUDNN 7.6). The model and weights were trained before v2. So other versions of TF will not work. If other dependencies are not found for your distribution, then please modify the `environment.yml` dependencies.
+This will create a new anaconda environment called `fpw-dl` and download all of the dependencies. NOTE: this package requires usage of Keras 2.2.4 and Tensorflow 1.15 (CUDA 10.0, CUDNN 7.6). The model and weights were trained before v2. So other versions of TF will not work. If other dependencies are not found for your distribution, then please modify the `environment.yml` dependencies.
 ```bash
 conda env create --file environment.yml
 ```
+*Note for **Windows** users: if you're having issues activating on command prompt/powershell and aren't familiar with Anaconda, I recommend just using the Anaconda Prompt (search it in the windows search bar)*
 
 ### Activate the environment
 ```bash
@@ -61,13 +62,18 @@ There are certain flags that might be useful, if you've already processed the da
 
 
 ## Generating Figures
-After analyzing a dataset you may use the `figure.py` script to generate some figures using matplotlib. For example, use the following command to generate the running average graph for normal biopsies after running the `analysis.py` on the normal dataset.
+After analyzing a dataset you may use the `figure.py` script to generate some figures using matplotlib. For example, use the following command to generate the running average graphs after running the `analysis.py` on the datasets.
 ```bash
-# note: the running_average_num is a MAX biopsy count. Does not guarantee that biopsy count 
-python figure.py --running_average --running_average_file dataset/normal/prediction/running_average_individual.json --running_average_num 35 --running_average_offset 0 --running_average_title "Running average of Normal Samples" --running_average_use_overall_average
+# note: the running_average_num is a MAX biopsy count. Does not guarantee that biopsy count
+
+# figure for fabry dataset
+python figure.py --running_average --running_average_file dataset/fabry/prediction/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of fabry samples" --running_average_use_overall_average --running_average_show_convergence
+
+# figure for normal dataset
+python figure.py --running_average --running_average_file dataset/normal/prediction/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of normal samples" --running_average_use_overall_average --running_average_show_convergence
 ```
 That command will produce something similar to. This graph is particularly useful for noise analysis and understanding, roughly, how many images need to be sampled per biopsy for the FPW averages to converge.
-![Running average of normal biopsies (images/running_average_normal.png)](images/running_average_normal.png)
+|![Running average of normal biopsies (images/running_average_normal.png)](images/running_average_normal.png)|![Running average of fabry biopsies (images/running_average_fabry.png)](images/running_average_fabry.png)|
 Please use `python figure.py --help` for more options.
 
 

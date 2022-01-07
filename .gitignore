@@ -4,6 +4,7 @@ analysis.log*
 dataset*.zip
 dices.xlsx
 running_average.png
+running_average.tiff
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

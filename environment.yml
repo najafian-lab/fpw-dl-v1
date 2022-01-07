@@ -1,22 +1,22 @@
 # run: conda env create --file environment.yml
-name: fpw-dl
+name: fpw-dl-dummy
 channels:
-  - conda-forge
   - defaults
   - anaconda
 dependencies:
-  - python==3.7
-  - anaconda
-  - numpy>=1.14.5
-  - opencv>=3.4.1
-  - openpyxl>=3.0.0
-  - scikit-image>=0.15.0,<0.16.0
-  - cudatoolkit>=10.0.0,<10.1.0
-  - cudnn>=7.6.0,<7.7.0
-  - mahotas>=1.4.0,<1.5.0
+  - python=3.7
+  - pip=21.3.*
+  - numpy=1.18.5
+  - opencv=3.4.2
+  - openpyxl=3.0.*
+  - scikit-image=0.15.*
+  - cudatoolkit=10.0.*
+  - cudnn=7.6.*
+  - conda-forge::mahotas=1.4.*
   - pip:
-    - tensorflow-gpu>=1.15.0,<1.16.0
-    - keras>=2.2.4,<2.2.9
-    - coloredlogs>=15.0.0
+    - tensorflow-gpu>=1.15.0,<1.15.6
+    - keras==2.2.4
+    - coloredlogs
     - tqdm
     - seaborn
+    - requests
