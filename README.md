@@ -72,4 +72,4 @@ Please use `python figure.py --help` for more options.
 
 
 ## Issues
-If there are any issues with the repository or process, please message [David Smerkous \<smerkd@uw.edu\>](mailto:smerkd@uw.edu) and/or [Dr. Behzad Najafian \<najafian@uw.edu\>](mailto:najafian@uw.edu).
+If there are any issues with the repository or process, please message David Smerkous at smerkd@uw.edu, and/or Dr. Behzad Najafian at najafian@uw.edu.
