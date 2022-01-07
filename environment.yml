@@ -1,5 +1,5 @@
 # run: conda env create --file environment.yml
-name: fpw-dl-dummy
+name: fpw-dl
 channels:
   - defaults
   - anaconda
@@ -7,7 +7,6 @@ dependencies:
   - python=3.7
   - pip=21.3.*
   - numpy=1.18.5
-  - opencv=3.4.2
   - openpyxl=3.0.*
   - scikit-image=0.15.*
   - cudatoolkit=10.0.*
@@ -20,4 +19,5 @@ dependencies:
     - tqdm
     - seaborn
     - requests
+    - opencv-python==3.4.*
     - tinycss2>=1.0.0

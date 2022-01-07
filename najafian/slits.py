@@ -66,7 +66,7 @@ def process_slits(layer, contours, lines, lengths, ilog=None, ret_more=False):
     Returns:
         tuple: distances (list of float), avg_distance (float), slit_count (int), attachments (list of float), actual_slit_locations (list of tuple (x, y)) [only if ret_more is True]
     """
-    keypoints = blober.detect(layer)
+    keypoints = list(blober.detect(layer))
     lines_range = range(len(lines))
     slit_lines = [[] for _ in lines_range]
 
@@ -76,7 +76,7 @@ def process_slits(layer, contours, lines, lengths, ilog=None, ret_more=False):
         closest = -1
         distance = sys.maxsize
         for i in lines_range:
-            dist = -cv2.pointPolygonTest(lines[i], kp.pt, True)
+            dist = -cv2.pointPolygonTest(lines[i], (int(kp.pt[0]), int(kp.pt[1])), True)
 
             # if it's inside the line then quite
             if dist <= 0:

@@ -14,9 +14,9 @@ import configs
 WORK_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET = 'dataset'
 PREDICTED_MASKS = os.path.join(
-    WORK_DIR, DATASET, 'validation', 'images', 'prediction', '*.tiff')
+    WORK_DIR, DATASET, 'eval', 'images', 'prediction', '*.tiff')
 SEGMENTED_MASKS = os.path.join(
-    WORK_DIR, DATASET, 'validation', 'masks', '*.tiff')
+    WORK_DIR, DATASET, 'eval', 'masks', '*.tiff')
 NETWORK_SIZE = tuple(configs.load_project_settings()[
                      'network_in'])  # get network image size
 

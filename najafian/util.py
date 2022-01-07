@@ -165,10 +165,10 @@ def draw_lines(img, series, color, thickness, circles=False):
         circles (bool, optional): draw list of circles instead of lines. Defaults to False.
     """
     if len(series) > 0 and circles:
-        cv2.circle(img, tuple(series[0]), 4, color, -1)
+        cv2.circle(img, (int(series[0][0]), int(series[0][1])), 4, color, -1)
 
     for i in range(len(series) - 1):
-        cv2.line(img, tuple(series[i]), tuple(series[i + 1]), color, thickness)
+        cv2.line(img, (int(series[i][0]), int(series[i][1])), (int(series[i + 1][0]), int(series[i + 1][1])), color, thickness)
 
         if circles:
-            cv2.circle(img, tuple(series[i + 1]), 4, color, -1)
+            cv2.circle(img, (int(series[i + 1][0]), int(series[i + 1][1])), 4, color, -1)

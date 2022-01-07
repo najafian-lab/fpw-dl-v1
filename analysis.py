@@ -107,6 +107,8 @@ def ilog(image, title='result', delay=-1):
         if delay >= 0:
             cv2.waitKey(delay)
 
+    # NOTE: to save the results to a file
+    # please use the opencv cv2.imsave() function
 
 def process_post(in_dir, bulk=False, gs=None, check_files=None):
     """ Process the layers after the segmentation masks have been created
@@ -525,7 +527,7 @@ def process_bulk_post(in_dir, prediction_files, prediction_folders, export_ind=N
     wb = Workbook()
     ws = wb.active
     ws.title = 'Bulk Report'
-    ws.append(['Report Folder', 'File Count', 'Average Time', 'Average FPW',
+    ws.append(['Report Folder', 'Average File Slit Count', 'Average Time', 'Average FPW',
                'STD FPW', 'Membrane Length', 'Average Attachment', 'STD Attachment', 'Fraction FPW'])
 
     # do a global measurement book
@@ -990,17 +992,32 @@ def process(folder, bulk, export_ind=None):
         load_model(model_json, model_weights, model_props, is_layer_model=True, force_reload=False, bs=args.batch_size)
         log('successfully loaded the model into GPU')
     else:
-        log('not loading tensorflow... skipping prediction')
+        log('not loading tensorflow... skipping prediction since pskip was specified')
 
     # are we doing a bulk analysis or a single analysis
     if bulk:
+        # create the masks
         prediction_files, prediction_folders = process_bulk_folder(folder)
-        structure = get_glom_structure(folder)
-        process_bulk_post(folder, prediction_files,
-                          prediction_folders, export_ind, structure)
+        
+        # vision process
+        if not args.vskip:
+            log('post processing bulk using vision')
+            structure = get_glom_structure(folder)
+            process_bulk_post(folder, prediction_files,
+                            prediction_folders, export_ind, structure)
+        else:
+            log('skipping post processing since vskip was specified')
     else:
+        # create the masks
         process_folder(folder)
-        process_post(folder)
+
+        # vision process
+        if not args.vskip:
+            log('post processing single folder using vision')
+            process_post(folder)
+        else:
+            log('skipping post processing since vskip was specified')
+    
     log('all processing finished')
     log('click quit to exit the program')
 
