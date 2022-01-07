@@ -1,0 +1,18 @@
+{
+	"model": "model/model.json",
+	"weights": "model/weights.h5",
+	"props": "model/dataprops.json",
+	"crop_image": [1024, 1104],
+	"network_in": [640, 640],
+	"min_threshold": 55,
+	"classes": [
+		{
+			"color": "#3F51B5"
+		},
+		{
+			"color": "#FFB900"
+		}
+	],
+	"__comment__": "There are other constants/settings in membrane.py and slits.py. Please check out those files if you want to do fine adjustments to the algorithm",
+	"__comment2__": "Files with a dot in front are removed from processing, and segmentation extensions are specified there, a please check configs.py for more info"
+}
