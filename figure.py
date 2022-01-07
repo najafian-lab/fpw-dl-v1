@@ -141,6 +141,6 @@ if args.running_average:
     ax.set_title(args.running_average_title, **csfont)
     ax.set_ylim(y_lim)
     ax.legend(frameon=True, loc='center left', bbox_to_anchor=(1, 0.5))
-    fig.savefig('running_average.tiff')
+    fig.savefig('running_average.png')
 
 print('Exiting...')
