@@ -12,6 +12,7 @@ dependencies:
   - cudatoolkit=10.0.*
   - cudnn=7.6.*
   - conda-forge::mahotas=1.4.*
+  - opencv=3.4.*
   - pip:
     - tensorflow-gpu>=1.15.0,<1.15.6
     - keras==2.2.4
@@ -19,5 +20,4 @@ dependencies:
     - tqdm
     - seaborn
     - requests
-    - opencv-python==3.4.*
     - tinycss2>=1.0.0

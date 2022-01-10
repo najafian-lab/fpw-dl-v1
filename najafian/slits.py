@@ -76,7 +76,7 @@ def process_slits(layer, contours, lines, lengths, ilog=None, ret_more=False):
         closest = -1
         distance = sys.maxsize
         for i in lines_range:
-            dist = -cv2.pointPolygonTest(lines[i], (int(kp.pt[0]), int(kp.pt[1])), True)
+            dist = -cv2.pointPolygonTest(lines[i], (kp.pt[0], kp.pt[1]), True)
 
             # if it's inside the line then quite
             if dist <= 0:

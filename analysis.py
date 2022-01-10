@@ -107,8 +107,6 @@ def ilog(image, title='result', delay=-1):
         if delay >= 0:
             cv2.waitKey(delay)
 
-    # NOTE: to save the results to a file
-    # please use the opencv cv2.imsave() function
 
 def process_post(in_dir, bulk=False, gs=None, check_files=None):
     """ Process the layers after the segmentation masks have been created
@@ -996,28 +994,21 @@ def process(folder, bulk, export_ind=None):
 
     # are we doing a bulk analysis or a single analysis
     if bulk:
-        # create the masks
         prediction_files, prediction_folders = process_bulk_folder(folder)
-        
-        # vision process
-        if not args.vskip:
-            log('post processing bulk using vision')
-            structure = get_glom_structure(folder)
+        structure = get_glom_structure(folder)
+
+        if args.vskip:
+            log('skipping vision processing...')
+        else:
             process_bulk_post(folder, prediction_files,
                             prediction_folders, export_ind, structure)
-        else:
-            log('skipping post processing since vskip was specified')
     else:
-        # create the masks
         process_folder(folder)
-
-        # vision process
-        if not args.vskip:
-            log('post processing single folder using vision')
-            process_post(folder)
+        
+        if args.vskip:
+            log('skipping vision processing...')
         else:
-            log('skipping post processing since vskip was specified')
-    
+            process_post(folder)
     log('all processing finished')
     log('click quit to exit the program')
 
