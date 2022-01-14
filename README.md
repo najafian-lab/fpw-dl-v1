@@ -118,7 +118,7 @@ After analyzing a dataset you may use the `figure.py` script to generate some fi
 # note: the running_average_num is a MAX biopsy count. Does not guarantee that biopsy count
 
 # figure for fabry dataset
-python figure.py --running_average --running_average_file dataset/fabry/prediction/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of fabry samples" --running_average_use_overall_average --running_average_show_convergence
+python figure.py --running_average --running_average_file dataset/fabry/prediction/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of Fabry samples" --running_average_use_overall_average --running_average_show_convergence
 
 # figure for normal dataset
 python figure.py --running_average --running_average_file dataset/normal/prediction/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of normal samples" --running_average_use_overall_average --running_average_show_convergence

@@ -9,6 +9,11 @@ from numpy.testing._private.utils import runstring
 import seaborn as sns
 from matplotlib import rc
 
+
+# x and y limitations (REQUIRED)
+Y_LIM = [0.4, 1.6]
+X_LIM = [-5.0, 150]
+
 random.seed(100)  # to make results consistent
 SHAPES = [
     ('solid', 'solid'),  # Same as (0, ()) or '-'
@@ -79,7 +84,6 @@ if args.running_average:
     colors = sns.color_palette('viridis', len(data) + 2)  # [(0, 0, 0)] * (len(data) + 2)
 
     counts = []
-    y_lim = [0.4, 1.6]
     data = data[args.running_average_offset:]
     max_length = max([len(values) for values in data[:args.running_average_num]])  # get longest biopsy 
     x_vals = list(range(max_length))
@@ -121,7 +125,7 @@ if args.running_average:
             for i, v in enumerate(norm_avg_p):
                 if abs(v - 1.0) < 0.01:  # epsilon as second number
                     ax.axvline(x=(i + 1), color='green', alpha=0.5)
-                    ax.text((i + 1) + 0.1, y_lim[0] + 0.1, ' Roughly converges at {}'.format(i + 1), rotation=0)
+                    ax.text((i + 1) + 0.2, Y_LIM[0] + 0.08, ' Roughly\n converges\n at {}'.format(i + 1), rotation=0)
                     break
 
         ax.fill_between(x_vals, norm_avg_m, norm_avg_p, color='black', alpha=0.55, zorder=3, label='Overall\nNormalized\nAverage')
@@ -131,15 +135,16 @@ if args.running_average:
 
     # add the min and max count lines
     ax.axvline(x=np.min(counts), color='gray', alpha=0.8)
-    ax.text(np.min(counts) + 0.1, y_lim[0] + 0.1, ' Min Images {}'.format(np.min(counts)), rotation=0)
+    ax.text(np.min(counts) + 0.2, Y_LIM[0] + 0.1, ' Min\n images {}'.format(np.min(counts)), rotation=0)
     ax.axvline(x=np.max(counts), color='gray', alpha=0.8,
                linestyle='-')
-    ax.text(np.max(counts) - 0.1, y_lim[0] + 0.1, 'Max Images {} '.format(np.max(counts)), rotation=0, horizontalalignment='right')
+    ax.text(np.max(counts) - 0.2, Y_LIM[0] + 0.1, 'Max \nimages {} '.format(np.max(counts)), rotation=0, horizontalalignment='right')
     
     ax.set_ylabel('FPW Normalized Running Average', **csfont)
     ax.set_xlabel('# of Images', **csfont)
     ax.set_title(args.running_average_title, **csfont)
-    ax.set_ylim(y_lim)
+    ax.set_ylim(Y_LIM)
+    ax.set_xlim(X_LIM)
     ax.legend(frameon=True, loc='center left', bbox_to_anchor=(1, 0.5))
     fig.savefig('running_average.png')
 
