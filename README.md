@@ -127,5 +127,8 @@ That commands will produce something similar to the images below in the file `ru
 |![Running average of normal biopsies (images/running_average_normal.png)](images/running_average_normal.png)|![Running average of fabry biopsies (images/running_average_fabry.png)](images/running_average_fabry.png)|
 Please use `python figure.py --help` for more figure options.
 
+## Note
+A cross platform version of the Report Utility has not been well tested and has some bugs. We're working on fixing them and publishing a web version of the utility. So currently all processing must be done through the CLI.
+
 ## Issues
 If there are any issues with the repository or process, please message David Smerkous at smerkd@uw.edu, and/or Dr. Behzad Najafian at najafian@uw.edu.
