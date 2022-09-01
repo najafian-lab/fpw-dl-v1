@@ -1,0 +1,13 @@
+dataset1.zip
+# ignore from the build context
+*.zip
+dataset/
+.git
+analysis.log*
+*.png
+images/
+.vscode/
+*.xlsx
+*/__pycache__
+*/*/__pycache__
+output/

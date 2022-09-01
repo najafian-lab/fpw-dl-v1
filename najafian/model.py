@@ -182,4 +182,3 @@ def run_prediction_on_folder(folder, to_log=True):
         batch_files = files[batch:batch + batch_size]
         yield (ind, batches, batch_files) + run_prediction(batch_files)
         ind += 1
-

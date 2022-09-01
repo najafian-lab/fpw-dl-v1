@@ -7,18 +7,27 @@ import numpy as np
 from openpyxl import Workbook
 from skimage.external.tifffile import tifffile
 from tqdm import tqdm
+from docker import ensure_output, IN_DOCKER, OUTPUT_DIR, DATASET_DIR
 
 import configs
 
 # specify the evaluation directories
-WORK_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASET = 'dataset'
-PREDICTED_MASKS = os.path.join(
-    WORK_DIR, DATASET, 'eval', 'images', 'prediction', '*.tiff')
-SEGMENTED_MASKS = os.path.join(
-    WORK_DIR, DATASET, 'eval', 'masks', '*.tiff')
+if IN_DOCKER:
+    PREDICTED_MASKS = os.path.join(OUTPUT_DIR, 'eval', 'prediction', '*.tiff')
+    SEGMENTED_MASKS = os.path.join(DATASET_DIR, 'eval', 'masks', '*.tiff')
+else:
+    WORK_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATASET = 'dataset'
+    PREDICTED_MASKS = os.path.join(
+        WORK_DIR, DATASET, 'eval', 'prediction', '*.tiff')
+    SEGMENTED_MASKS = os.path.join(
+        WORK_DIR, DATASET, 'eval', 'masks', '*.tiff')
+
 NETWORK_SIZE = tuple(configs.load_project_settings()[
-                     'network_in'])  # get network image size
+                    'network_in'])  # get network image size
+
+# ensure the output directory exists
+ensure_output()
 
 
 def sort_unique_files(files):
@@ -125,7 +134,7 @@ def compare():
             np.std(membranes)), float(np.mean(slits)), float(np.std(slits))])
 
     print('Exporting notebook....')
-    wb.save('dices.xlsx')
+    wb.save(os.path.join(OUTPUT_DIR, 'dices.xlsx'))
     print('Done! Saved results to dices.xlsx')
 
 

@@ -1,0 +1,12 @@
+# run: conda env create --file environment.yml
+name: fpw-dl
+channels:
+  - defaults
+  - anaconda
+dependencies:
+  - python=3.7
+  - pip
+  - numpy=1.18.5
+  - openpyxl=3.0.*
+  - cudatoolkit=10.0.*
+  - cudnn=7.6.*

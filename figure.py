@@ -2,17 +2,21 @@
 import argparse
 import random
 import json
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing._private.utils import runstring
 import seaborn as sns
 from matplotlib import rc
+from docker import OUTPUT_DIR, ensure_output, IN_DOCKER
 
 
 # x and y limitations (REQUIRED)
 Y_LIM = [0.4, 1.6]
 X_LIM = [-5.0, 150]
+ensure_output()  # ensure output folder exists
+
 
 random.seed(100)  # to make results consistent
 SHAPES = [
@@ -43,7 +47,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 parser.add_argument(
     '--running_average', help='show a window preview of segmentations and results', action='store_true')
 parser.add_argument(
-    '--running_average_file', type=str, default='dataset/fabry/prediction/running_average_individual.json', help='File with all of the file measurements')
+    '--running_average_file', type=str, default='output/fabry/running_average_individual.json', help='File with all of the file measurements')
 parser.add_argument(
     '--running_average_num', type=int, default=20, help='Number of biopsies to show for running average')
 parser.add_argument(
@@ -146,6 +150,6 @@ if args.running_average:
     ax.set_ylim(Y_LIM)
     ax.set_xlim(X_LIM)
     ax.legend(frameon=True, loc='center left', bbox_to_anchor=(1, 0.5))
-    fig.savefig('running_average.png')
+    fig.savefig(os.path.join(OUTPUT_DIR, 'running_average.png'))
 
 print('Exiting...')

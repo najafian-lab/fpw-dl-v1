@@ -1,0 +1,20 @@
+# to reduce the size of the docker layers the deps have been split up in the environment  
+keras==2.2.4
+coloredlogs
+tqdm
+seaborn
+requests
+tinycss2>=1.0.0
+boto3
+environs
+SQLAlchemy==1.4.37
+PyMySQL==1.0.2
+psycopg2-binary==2.9.3
+cryptography==37.0.2
+ec2-metadata
+tifffile
+protobuf==3.20.0
+eventlet==0.33.1
+colorama
+bs4
+lxml
