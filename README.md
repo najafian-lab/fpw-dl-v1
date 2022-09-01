@@ -58,6 +58,8 @@ Below is the guide to using this code/model to analyze images and create a repor
 
 ## Downloading the Dataset
 The dataset that was used to evaluate the model, as presented in the paper, is too large for github. So a public [google drive link](https://drive.google.com/file/d/1bAQLG-5c1JxkwHm8ttPqh-I7JjfSEJYG/view?usp=sharing) has been provided, and an easy to use download script is in this repo. The download script will download the zip file from google drive and extract it in the repository directory. This dataset will consume **~34Gb** of disk space. 
+
+
 **Docker**
 ```bash
 # "-v $(pwd)/dataset:/dataset" tells docker to mount the current working directory's dataset folder to the /dataset folder in the container
@@ -73,6 +75,8 @@ python download.py # please be patient as this might take a while
 
 ## Analyzing FPW on two datasets
 The two datasets analyzed in the paper were a random assortment of TEM images of mostly fabry and some normal patients. Please see the [Overview](#Overview) for a description of the images. Use the `analysis.py` script to produces the segmentation masks and process the images.
+
+
 **Docker**
 ```bash
 # "dataset/fabry" and "dataset/normal" are the folders to process 
@@ -132,6 +136,8 @@ The worse example shows the sensitivity of some ML models. This can be due to va
 
 ## Evaluating the model
 The evaluation dataset inside `dataset/eval` contains two folders called `images` and `masks`. The `images` folder are randomly selected EM images, with their respective ground truth masks in the `masks` folder. Some images were taken from the training masks and some from the validation set, the ratio between them is unknown as the data has been long missing. To run the evaluation please use the following commands
+
+
 **Docker**
 ```bash
 # first the predicted masks need to be produced
@@ -182,6 +188,8 @@ python figure.py --running_average --running_average_file output/fabry/running_a
 # figure for normal dataset
 python figure.py --running_average --running_average_file output/normal/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of normal samples" --running_average_use_overall_average --running_average_show_convergence
 ```
+
+
 **Docker variant**
 For docker, given the above commands are simple and just add `docker run -v $(pwd)/dataset:/dataset -v $(pwd)/output:/output fpwdlv1` before the figure commands, remove the `python`, and note everything will be put into the `output` directory. Also note that all folders that are relative such as `output` should be `/output` for the docker image.
 
