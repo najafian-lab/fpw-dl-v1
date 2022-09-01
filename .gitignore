@@ -5,6 +5,9 @@ dataset*.zip
 dices.xlsx
 running_average.png
 running_average.tiff
+output/
+testoutput/
+*.tar.gz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

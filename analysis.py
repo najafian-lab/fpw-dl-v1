@@ -19,13 +19,17 @@ import configs
 import najafian.report as report
 import najafian.model as model
 from configs import FILE_EXTENSION, file_dir
+from docker import ensure_dataset_and_output, IN_DOCKER, DATASET_DIR, OUTPUT_DIR
 from najafian.find_path import find_file
 from najafian.membrane import process_membrane
 from najafian.slits import process_slits
 
 # ---- ARGUMENT PARSING ----
 parser = argparse.ArgumentParser()
-parser.add_argument('folder', type=str, help='folder to process')
+
+# add argument depending on if in docker
+parser.add_argument('input', type=str, help='folder to process')
+parser.add_argument('-o', '--output', type=str, help='folder to export to', default=OUTPUT_DIR)
 parser.add_argument('-bs', '--batch_size', type=int, help='batch size, depends on system', default=2)
 parser.add_argument(
     '--preview', help='show a window preview of segmentations and results', action='store_true')
@@ -43,19 +47,23 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-# get the base dir
-if not os.path.isdir(args.folder):
-    print(f'The folder {args.folder} does not exist')
-    exit(1)
+# make sure the specified folders do exist
+ensure_dataset_and_output(args.input, args.output)
+
+# now make sure the "constant/globalish" is updated
+DATASET_DIR = os.path.abspath(args.input)
+OUTPUT_DIR = os.path.abspath(args.output)
 
 # glom only works with bulk
 if not args.bulk and args.use_zscore:
     print(f'zscore only works on bulk processes')
     exit(1)
 
-BASE_DIR = os.path.abspath(args.folder)
-if str(BASE_DIR).endswith(os.sep):
-    BASE_DIR = BASE_DIR[:-1]
+# fix endings to not include last folder option
+if str(DATASET_DIR).endswith(os.sep):
+    DATASET_DIR = DATASET_DIR[:-1]
+if str(OUTPUT_DIR).endswith(os.sep):
+    OUTPUT_DIR = OUTPUT_DIR[:-1]
 # --- END ARGUMENT PARSING ---
 
 
@@ -108,12 +116,13 @@ def ilog(image, title='result', delay=-1):
             cv2.waitKey(delay)
 
 
-def process_post(in_dir, bulk=False, gs=None, check_files=None):
+def process_post(in_dir, output, bulk=False, gs=None, check_files=None):
     """ Process the layers after the segmentation masks have been created
     please look at membrane.py and slits.py for more details information on processing each layer
 
     Args:
         in_dir (str): input directory to process
+        output (str): the output directory to place files in
         bulk (bool, optional): is this a bulk operation (handles specific stuff like creating the prediction folder). Defaults to False.
         gs (dict, optional): global reporting data (each individual measurement and where to put it on the sheet). Defaults to None.
         check_files (list of str, optional): input file names to compare to. Defaults to None.
@@ -126,12 +135,15 @@ def process_post(in_dir, bulk=False, gs=None, check_files=None):
         dict: a dictionary of 
     """
     # create the prediction folder for the images if we're not in bulk mode
-    if not bulk:
-        in_dir = os.path.join(in_dir, 'prediction')
+    # @TODO remove when tested
+    # if not bulk:
+    #     # note that in_dir is where the masks are located
+    #     # then the output folder is just the general output folder (not a specific prediction folder)
+    #     in_dir = os.path.join(output, 'prediction')
 
-        # add the last sep if it's not there
-        if in_dir[-1] != os.sep:
-            in_dir += os.sep
+    #     # add the last sep if it's not there
+    #     if in_dir[-1] != os.sep:
+    #         in_dir += os.sep
 
     def sort_unique_files(files):
         """ Gets the unique and sorted list of files with the hidden files removed """
@@ -170,7 +182,7 @@ def process_post(in_dir, bulk=False, gs=None, check_files=None):
         log('all file checks passed')
 
     # load some settings
-    settings = configs.load_project_settings()
+    # settings = configs.load_project_settings()
     log('files: %d' % len(in_files))
     membrane = 0
     membranes = []
@@ -433,6 +445,7 @@ def process_post(in_dir, bulk=False, gs=None, check_files=None):
         min_max_slit_count = -1, -1
         avg_attachment = 0
         std_attachment = -1
+        avg_time = 0
     else:
         avg_distance = float(np.mean(calc_distances, dtype=np.float32))
         std_distance = float(np.std(calc_distances, dtype=np.float32))
@@ -506,20 +519,19 @@ def process_post(in_dir, bulk=False, gs=None, check_files=None):
     return report_dict, standard_data
 
 
-def process_bulk_post(in_dir, prediction_files, prediction_folders, export_ind=None, structure={}):
-    prediction_dir = os.path.join(in_dir, 'prediction')
+def process_bulk_post(in_dir, out_dir, prediction_files, prediction_folders, export_ind=None, structure={}):
+    log('running bulk post on dataset ' + in_dir)
+    prediction_dir = os.path.join(out_dir, 'prediction')
 
     # add the last sep if it's not there
     if prediction_dir[-1] != os.sep:
-        in_dir += os.sep
+        prediction_dir += os.sep
 
     if not os.path.exists(prediction_dir):
         log('creating prediction folder')
         os.makedirs(prediction_dir)
     else:
         log('prediction folder already exists')
-
-    bulk_dict = {}  # store all values
 
     # create the global report
     wb = Workbook()
@@ -540,8 +552,8 @@ def process_bulk_post(in_dir, prediction_files, prediction_folders, export_ind=N
     file_aggregate_distances = []
 
     for prediction_file, prediction_folder in zip(prediction_files, prediction_folders):
-        log('running post scrip on folder ' + prediction_folder)
-        report_dict, sd = process_post(prediction_folder, bulk=True, gs={
+        log('running post script on folder ' + prediction_folder)
+        report_dict, sd = process_post(prediction_folder, out_dir, bulk=True, gs={
             'sheet': gs,
             'mapping': structure
         }, check_files=prediction_file)
@@ -563,12 +575,12 @@ def process_bulk_post(in_dir, prediction_files, prediction_folders, export_ind=N
         log('done running post script on folder ' + prediction_folder)
 
     # add the final touches and export the report
-    export_file = os.path.join(prediction_dir, 'bulk_report.xlsx')
+    export_file = os.path.join(out_dir, 'bulk_report.xlsx')
 
     # this is a very useful export as it gives us
     # aggregate results of individual distances that we can use
     # to calculate a running average later on
-    with open(os.path.join(prediction_dir, 'running_average_individual.json'), 'w') as avg_file:
+    with open(os.path.join(out_dir, 'running_average_individual.json'), 'w') as avg_file:
         avg_file.write(json.dumps({
             'data': file_aggregate_distances
         }))
@@ -592,7 +604,7 @@ def process_bulk_post(in_dir, prediction_files, prediction_folders, export_ind=N
         logger.error(f'error {str(err)}')
 
     # group similar gloms (from each biopsy)
-    report_std = os.path.join(prediction_dir, 'std')
+    report_std = os.path.join(out_dir, 'std')
 
     # add the last sep if it's not there
     if report_std[-1] != os.sep:
@@ -604,7 +616,7 @@ def process_bulk_post(in_dir, prediction_files, prediction_folders, export_ind=N
     else:
         log('prediction folder already exists')
 
-    report_std_img = os.path.join(prediction_dir, 'std-img')
+    report_std_img = os.path.join(out_dir, 'std-img')
 
     # add the last sep if it's not there
     if report_std_img[-1] != os.sep:
@@ -868,15 +880,16 @@ def get_folders(folder):
     return [f[1] for f in folders]
 
 
-def process_folder(in_dir):
+def process_folder(in_dir, output):
     """ Processes a single folder in non-bulk mode. Will run predictions if available
 
     Args:
         in_dir (str): folder to process/analyze
+        output (str): the output folder to place the images
     """
 
     join = os.path.join
-    prediction_dir = join(in_dir, 'prediction')
+    prediction_dir = join(output, 'prediction')
 
     # add the last sep if it's not there
     if prediction_dir[-1] != os.sep:
@@ -887,13 +900,11 @@ def process_folder(in_dir):
         log('creating prediction folder')
         os.makedirs(prediction_dir)
 
-    prediction_dir = join(in_dir, 'prediction')
-
     # run the prediction on the folder
     if not args.pskip:
         import najafian.model as model
         for batch, total, files, original, prediction in model.run_prediction_on_folder(proc_files, to_log=True):
-            batch_size = prediction.shape[0]
+            batch_size = len(prediction)
             files = configs.strip_file_names(files)
             for i in range(batch_size):
                 configs.save_mask(join(prediction_dir, f'{files[i]}{FILE_EXTENSION}'), prediction[i])
@@ -903,11 +914,12 @@ def process_folder(in_dir):
     log('successfully finished the prediction')
 
 
-def process_bulk_folder(in_dir):
+def process_bulk_folder(in_dir, out_dir):
     """ Similar to process but this function generates masks for folders in bulk (with sub-folders)
 
     Args:
         in_dir (str): input folder to generate masks for
+        out_dir (str): output folder to place the masks
 
     Returns:
         tuple: prediction_files (list of str), prediction_folders (list of str)
@@ -919,7 +931,8 @@ def process_bulk_folder(in_dir):
     prediction_folders = []
 
     for folder in folders:
-        prediction_dir = join(folder, 'prediction')
+        rel_path = os.path.relpath(folder, in_dir)
+        prediction_dir = join(out_dir, 'prediction', rel_path)
 
         # add the last sep if it's not there
         if prediction_dir[-1] != os.sep:
@@ -944,7 +957,7 @@ def process_bulk_folder(in_dir):
             log('processing bulk folder ' + prediction_folder)
             for batch, total, files, original, prediction in model.run_prediction_on_folder(prediction_file, to_log=True):
                 log('bulk progress %d/%d' % (file_index, file_count))
-                batch_size = prediction.shape[0]
+                batch_size = len(prediction)
                 files = configs.strip_file_names(files)
                 for i in range(batch_size):
                     configs.save_mask(join(prediction_folder, f'{files[i]}{FILE_EXTENSION}'), prediction[i])
@@ -959,7 +972,7 @@ def process_bulk_folder(in_dir):
     return prediction_files, prediction_folders
 
 
-def process(folder, bulk, export_ind=None):
+def process(folder, output, bulk, export_ind=None):
     """ Processes the specified folder either as all images or in bulk and will handle skipping prediction if specified
 
     Args:
@@ -967,7 +980,7 @@ def process(folder, bulk, export_ind=None):
         bulk (bool): if True then process each sub-folder 
         export_ind (bool, optional): currently unused (originally for GUI). Defaults to None.
     """
-    log('processing folder ' + folder)
+    log('processing folder ' + folder + ' to output ' + output)
     log('is bulk: ' + str(bulk))
 
     # loads tensorflow if we're going to be predicting
@@ -994,21 +1007,21 @@ def process(folder, bulk, export_ind=None):
 
     # are we doing a bulk analysis or a single analysis
     if bulk:
-        prediction_files, prediction_folders = process_bulk_folder(folder)
+        prediction_files, prediction_folders = process_bulk_folder(folder, output)
         structure = get_glom_structure(folder)
 
         if args.vskip:
             log('skipping vision processing...')
         else:
-            process_bulk_post(folder, prediction_files,
+            process_bulk_post(folder, output, prediction_files,
                             prediction_folders, export_ind, structure)
     else:
-        process_folder(folder)
+        process_folder(folder, output)
         
         if args.vskip:
             log('skipping vision processing...')
         else:
-            process_post(folder)
+            process_post(folder, output)
     log('all processing finished')
     log('click quit to exit the program')
 
@@ -1018,7 +1031,7 @@ if __name__ == '__main__':
     log('Starting analysis. Developed by Najafian Lab')
 
     try:
-        process(folder=args.folder, bulk=args.bulk)
+        process(folder=DATASET_DIR, output=OUTPUT_DIR, bulk=args.bulk)
     except Exception as err:
         log(f'Failed to process {str(err)}')
         traceback.print_exc()

@@ -17,6 +17,7 @@ FILE_EXTENSION = '.tiff'  # the extension for predicted files
 # load the configs.json from the current dir
 file_dir = os.path.dirname(os.path.realpath(__file__))
 project_file = os.path.join(file_dir, 'configs.json')
+model_dir = os.path.join(file_dir, 'model')
 project_settings = None  # this is a static so it's not loaded every time
 
 
@@ -38,6 +39,10 @@ def load_project_settings():
             # fix the json object location just in case of some bad formatting
             data = data[data.index('{'):data.rfind('}') + 1]
             project_settings = json.loads(data, object_pairs_hook=OrderedDict)
+
+    project_settings.update({
+        'model_dir': model_dir
+    })
 
     return project_settings
 
