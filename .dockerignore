@@ -11,3 +11,5 @@ images/
 */__pycache__
 */*/__pycache__
 output/
+dataset_old/
+dataset_old2/

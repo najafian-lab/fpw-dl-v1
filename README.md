@@ -17,7 +17,7 @@ Here are a few examples of EM images with varying quality.
 The easier it is for you to identify the components and slits in the image, the better the results of the ML model/vision scripts will be. As described in the paper, please use images that have good contrast between cells and membranes, with fewer artificats, and are of similar magnification that the model was trained on.
 
 ## System Recommendations
-For faster results we recommend an NVIDIA GPU that's equivalent to or better than a GTX 1070, and a modern PC. Just as a reference we used an AMD Ryzen 3900X with a Titan RTX, to generate the FPW estimates for the paper, with 64Gb of system ram and 24Gb of VRAM. Although other configurations will work, we cannot ensure inference time will be fast or if the model will even load with systems that have low GPU RAM or system RAM. We highly recommend running this on Linux as it has the best support for ML when it comes to GPUs and docker images. Although you could run this model on CPU, we wouldn't recommend it for larger datasets.
+For faster results we recommend an NVIDIA GPU that's equivalent to or better than a GTX 1070, and a modern PC. Just as a reference we used an AMD Ryzen 3900X with a Titan RTX (trained in ~2019), to generate the FPW estimates for the paper, with 64Gb of system ram and 24Gb of VRAM. Although other configurations will work, we cannot ensure inference time will be fast or if the model will even load with systems that have low GPU RAM or system RAM. We highly recommend running this on Linux as it has the best support for ML when it comes to GPUs and docker images. Although you could run this model on CPU, we wouldn't recommend it for larger datasets.
 
 # Docker Installation
 If you're familiar with docker, or even if you're not entirely familiar, this is the easiest option to get all of the requirements/dependencies and code working out of the box with no fiddling. The only requirement is for those who want to use a GPU that they install the [nvidia-docker](https://docs.nvidia.com/ai-enterprise/deployment-guide/dg-docker.html). However, it should be noted that although windows supports docker it does [NOT support](https://github.com/NVIDIA/nvidia-docker/wiki/Frequently-Asked-Questions#is-microsoft-windows-supported) nvidia/GPU dockers. Thus, for windows users you must use the CPU only version or install through the [Conda Installation](#conda-installation).
@@ -31,6 +31,8 @@ docker tag smerkd/forknetv5:latest fpwdlv1  # tag for easy run use
 
 
 # Conda Installation
+It's highly recommended to use the docker installation as it will be a smoother process and all dependencies within the container are already installed. Since the model was trained on Tf-v1, all the way back in 2018/2019, it is required to use the dependencies provided in the `environment.yml` for this to run. The docker image will have all the correct dependencies installed. If you would like to use the website, currently in alpha, to process the images visit [here](https://fpwdl.smerkous.com).
+
 ### Anaconda and Command Line
 The installation does require a recent installation of anaconda. Please visit [anacondas page](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html) for more info. Furthermore, installation and usage of this repo requires basic knowledge of command line. This project was developed in linux, but should be able to run on any system.
 
@@ -57,7 +59,7 @@ conda activate fpw-dl
 Below is the guide to using this code/model to analyze images and create a report. The guide is very similar for both the docker based and "native Anaconda" solutions. There will be two versions of the command for each setup. Please modify the script as needed for your system.
 
 ## Downloading the Dataset
-The dataset that was used to evaluate the model, as presented in the paper, is too large for github. So a public [google drive link](https://drive.google.com/file/d/1bAQLG-5c1JxkwHm8ttPqh-I7JjfSEJYG/view?usp=sharing) has been provided, and an easy to use download script is in this repo. The download script will download the zip file from google drive and extract it in the repository directory. This dataset will consume **~34Gb** of disk space. 
+The dataset that was used to evaluate the model, as presented in the paper, is too large for github. So a public [google drive folder](https://drive.google.com/drive/folders/1o4VukfiqH6GBm7-h9FlDfIK0-8wJ5JAf?usp=sharing) has been provided, and an easy to use download script is in this repo. The download script will download all the zip file from google drive and extract it in the repository directory. This dataset will consume **~40Gb** of disk space. If for some reason the script fails, due to Google changing something to their site, then please download the zips above and unzip them into the `datasets` folder as described below. 
 
 
 **Docker**
@@ -73,8 +75,8 @@ docker run -v $(pwd)/dataset:/dataset fpwdlv1 download.py # please be patient as
 python download.py # please be patient as this might take a while
 ```
 
-## Analyzing FPW on two datasets
-The two datasets analyzed in the paper were a random assortment of TEM images of mostly fabry and some normal patients. Please see the [Overview](#Overview) for a description of the images. Use the `analysis.py` script to produces the segmentation masks and process the images.
+## Analyzing FPW on conditions
+The few conditions analyzed in the paper were a random assortment of TEM images trained on fabry, and normal patients. To see how well it would generalize to other conditions we also included some other conditions. Please see the [Overview](#Overview) for a description of the images. Use the `analysis.py` script to produces the segmentation masks and process the images.
 
 
 **Docker**
@@ -83,13 +85,25 @@ The two datasets analyzed in the paper were a random assortment of TEM images of
 # "--bulk" flag indicates multiple-subfolders to process 
 # "-bs 12" flag indicates a batch size of 12 (CHANGE THIS)
 # "--gpus all" if nvidia-docker is installed/configured it allows the docker to access GPUS. Note this is only available on linux!
-# process fabry
+# process fabry males
 mkdir -p output/fabry
 docker run -v $(pwd)/dataset:/dataset -v $(pwd)/output:/output --gpus all fpwdlv1 analysis.py /dataset/fabry -o /output/fabry --bulk --use_file_average -bs 12
 
 # process normal
 mkdir -p output/normal
 docker run -v $(pwd)/dataset:/dataset -v $(pwd)/output:/output --gpus all fpwdlv1 analysis.py /dataset/normal -o /output/normal --bulk --use_file_average -bs 12
+
+# process fabry females
+mkdir -p output/fabry-f
+docker run -v $(pwd)/dataset:/dataset -v $(pwd)/output:/output --gpus all fpwdlv1 analysis.py /dataset/fabry-f -o /output/fabry-f --bulk --use_file_average -bs 12
+
+# process minimal change disease
+mkdir -p output/mcdfsgs
+docker run -v $(pwd)/dataset:/dataset -v $(pwd)/output:/output --gpus all fpwdlv1 analysis.py /dataset/mcdfsgs -o /output/mcdfsgs --bulk --use_file_average -bs 12
+
+# process diabetic kidney disease
+mkdir -p output/dkd
+docker run -v $(pwd)/dataset:/dataset -v $(pwd)/output:/output --gpus all fpwdlv1 analysis.py /dataset/dkd -o /output/dkd --bulk --use_file_average -bs 12
 ```
 
 **Anaconda**
@@ -104,6 +118,8 @@ python analysis.py dataset/fabry -o output/fabry --bulk --use_file_average -bs 1
 # process normal
 mkdir -p output/normal
 python analysis.py dataset/normal -o output/normal --bulk --use_file_average -bs 12
+
+# similar process for rest. Just replace {condition} in output/{condition} and dataset/{condition}, and the available conditions such as fabry-f, mcdfsgs, normal, fabry, and dkd
 ```
 There are certain flags that might be useful, if you've already processed the dataset once. For example, `--pskip` will skip prediction and go straight to vision processing. Please see `python analysis.py --help` for more options.
 
@@ -180,21 +196,23 @@ This will generate the dice scores on all of the input images and group them tog
 ## Generating Figures
 After analyzing a dataset you may use the `figure.py` script to generate some figures using matplotlib. For example, use the following command to generate the running average graphs after running the `analysis.py` on the datasets.
 ```bash
-# note: the running_average_num is a MAX biopsy count. Does not guarantee that biopsy count
+python figure.py sampled_convergence
+```
+<!-- # note: the running_average_num is a MAX biopsy count. Does not guarantee that biopsy count
 
 # figure for fabry dataset
 python figure.py --running_average --running_average_file output/fabry/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of Fabry samples" --running_average_use_overall_average --running_average_show_convergence
 
 # figure for normal dataset
-python figure.py --running_average --running_average_file output/normal/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of normal samples" --running_average_use_overall_average --running_average_show_convergence
-```
+python figure.py --running_average --running_average_file output/normal/running_average_individual.json --running_average_num 20 --running_average_offset 0 --running_average_title "Running average of normal samples" --running_average_use_overall_average --running_average_show_convergence -->
 
 
 **Docker variant**
 For docker, given the above commands are simple and just add `docker run -v $(pwd)/dataset:/dataset -v $(pwd)/output:/output fpwdlv1` before the figure commands, remove the `python`, and note everything will be put into the `output` directory. Also note that all folders that are relative such as `output` should be `/output` for the docker image.
 
-That commands will produce something similar to the images below in the file `running_average.png`. This graph is particularly useful for noise analysis and understanding, roughly, how many images need to be sampled for FPW averages to converge per biopsy.
-|![Running average of normal biopsies (images/running_average_normal.png)](images/running_average_normal.png)|![Running average of fabry biopsies (images/running_average_fabry.png)](images/running_average_fabry.png)|
+That commands will produce something similar to the image(s) below in the file `running_average.png`. This graph is particularly useful for noise analysis and understanding, roughly, how many images need to be sampled for FPW averages to converge per biopsy. To see the other images please see the saved `images/sampled_{condition}.png`. Your results should be similar to those on the same dataset.
+<!-- |![Running average of normal biopsies (images/running_average_normal.png)](images/running_average_normal.png)|![Running average of fabry biopsies (images/running_average_fabry.png)](images/running_average_fabry.png)| -->
+|![Convergence of Normals (images/sampled_normal.png)](images/sampled_normal.png)|![Convergence of Fabry Males (images/sampled_fabry.png)](images/sampled_fabry.png)
 Please use `python figure.py --help` for more figure options.
 
 ## Note

@@ -549,6 +549,7 @@ def process_bulk_post(in_dir, out_dir, prediction_files, prediction_folders, exp
     results = []
     # global_distances = []
     standard_data = []
+    file_aggregate_names = []
     file_aggregate_distances = []
 
     for prediction_file, prediction_folder in zip(prediction_files, prediction_folders):
@@ -561,7 +562,14 @@ def process_bulk_post(in_dir, out_dir, prediction_files, prediction_folders, exp
 
         # extend the global distances and file aggregates
         # global_distances.extend(report_dict['global_distances'])
-        file_aggregate_distances.append([float(d) for d in report_dict['file_distances'] if d > 0])  # append it as a grouped item
+        grouped_names = []
+        grouped_distances = []
+        for d, f in zip(report_dict['file_distances'], report_dict['file']):
+            if d > 0:
+                grouped_names.append(str(f))
+                grouped_distances.append(float(d))
+        file_aggregate_names.append(grouped_names)
+        file_aggregate_distances.append(grouped_distances)  # append it as a grouped item
         standard_data.extend(sd)
 
         log('exporting report')
@@ -582,6 +590,8 @@ def process_bulk_post(in_dir, out_dir, prediction_files, prediction_folders, exp
     # to calculate a running average later on
     with open(os.path.join(out_dir, 'running_average_individual.json'), 'w') as avg_file:
         avg_file.write(json.dumps({
+            'folders': prediction_folders,
+            'file_names': file_aggregate_names,
             'data': file_aggregate_distances
         }))
 
