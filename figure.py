@@ -28,7 +28,7 @@ EPS = 0.01
 STD = 1.96
 ensure_output()  # ensure output folder exists
 
-
+# it was noticed that np.random.seed was not set for paper figures. Convergence results should be within a couple images 0-4
 random.seed(100)  # to make results consistent
 SHAPES = [
     ('solid', 'solid'),  # Same as (0, ()) or '-'

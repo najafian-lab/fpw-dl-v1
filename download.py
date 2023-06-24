@@ -46,10 +46,14 @@ def get_confirm_token(response):
     # check the html
     if html:
         sp = BeautifulSoup(response.text, 'lxml')
-        print(sp)
         for item in list(sp.find_all(id='downloadForm')) + list(sp.find_all(id='download-form')) + list(sp.find_all(id='downloadform')) + list(sp.find_all(id='download_form')):  # they seem to change it from time to time
             if 'action' in item.attrs:  # get the action url if available
                 return 'POST', item.attrs['action']
+
+        quota_str = str(sp).lower()
+        if 'quota' in quota_str and ('exceeded' in quota_str or 'reached' in quota_str):
+            print('Google Drive Quota limit reached. Probably too many people are downloading this file right now...')
+            exit(1)
 
     return 'GET', None
 
@@ -82,7 +86,7 @@ def download(id, filename):
         print('No large file token found')
 
     if response.status_code != 200:
-        print('Got a non 200 status code!')
+        print('Got a non 200 status code! Please try again later')
         exit(1)
 
     # save the file
