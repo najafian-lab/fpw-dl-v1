@@ -2,7 +2,7 @@
 Developed by David Smerkous at Najafian Lab.
 
 # Overview
-This repository contains the trained model, vision scripts, and relevant code to automate foot process width estimation on electron microscopy images. The model was trained on ~1024x1024 segmented EM images. The sample EM images were taken where the scaling was about 10nm/pixel, at ~30,000X magnification. The images were then downscaled to 640x640 for the custom ForkNet model. Please ensure good contrast and quality of datasets if intended for use. Please read more at the paper here **[LINK INSERT LATER]** 
+This repository contains the trained model, vision scripts, and relevant code to automate foot process width estimation on electron microscopy images. The model was trained on ~1024x1024 segmented EM images. The sample EM images were taken where the scaling was about 10nm/pixel, at ~30,000X magnification. The images were then downscaled to 640x640 for the custom ForkNet model. Please ensure good contrast and quality of datasets if intended for use. You can read the accompanying paper [here](https://www.kidney-international.org/article/S0085-2538(23)00675-0/fulltext).
 
 ## Image Examples
 Here are a few examples of EM images with varying quality.
